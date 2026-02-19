@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Enable Notifications</title>
+<style>
+body{
+  font-family:Arial;
+  background:#111;
+  color:#fff;
+  display:flex;
+  height:100vh;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+button{
+  padding:18px 35px;
+  font-size:20px;
+  border:none;
+  border-radius:8px;
+  background:#00c853;
+  color:#fff;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<h2>🔔 Enable Notifications</h2>
+
+<button id="btn">Allow Notifications</button>
+
+<p id="status"></p>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+
+<script>
+
+firebase.initializeApp({
+  apiKey: "AIzaSyCFpmW9ZvsFai6vc3-GosZxY0TU7ORmEqU",
+  authDomain: "rajavideo-f0804.firebaseapp.com",
+  projectId: "rajavideo-f0804",
+  storageBucket: "rajavideo-f0804.firebasestorage.app",
+  messagingSenderId: "1000952755183",
+  appId: "1:1000952755183:web:96aba391983d11315bfc1a"
+});
+
+const messaging = firebase.messaging();
+
+navigator.serviceWorker.register('/firebase-messaging-sw.js');
+
+document.getElementById("btn").onclick = function(){
+
+Notification.requestPermission().then(function(permission){
+
+if(permission === "granted"){
+
+messaging.getToken({
+  vapidKey: "BGvIvdhVW2DedBwPWTa2Bu8BChyNEXaVYua_MxcnyLEJkPJEiFiCHxQwK9l4KSZXAslbOpo0tossGUXTxoBNT_l9T0bvPUJ8J9j6XYPcKnGqhdxEX3dxGlkFvD0Ox9_j2h6M_eJbJ8vNiKJTmJazQyivNuKjMZCk"
+}).then(function(token){
+
+document.getElementById("status").innerText =
+"✅ Notifications Enabled";
+
+console.log("TOKEN:", token);
+
+});
+
+}else{
+
+document.getElementById("status").innerText =
+"❌ Permission Denied";
+
+}
+
+});
+
+};
+
+</script>
+
+</body>
+</html>
